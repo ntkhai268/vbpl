@@ -41,14 +41,18 @@ def save_document(document: dict, output_folder: str = None) -> str:
     return file_path
 
 
-def crawl_category_and_save(category_url: str, max_items: int = None, upload_files: bool = True) -> List[str]:
+import concurrent.futures
+
+def crawl_category_and_save(category_url: str, max_items: int = None, upload_files: bool = True, max_workers: int = 5) -> List[str]:
     """
     Crawl all documents from a category and save to JSON files.
+    Uses multi-threading for faster processing.
     
     Args:
         category_url: Category URL to crawl
         max_items: Maximum number of documents to process (for testing)
         upload_files: Whether to upload files to Google Drive
+        max_workers: Number of concurrent threads
         
     Returns:
         List of saved file paths
@@ -59,6 +63,7 @@ def crawl_category_and_save(category_url: str, max_items: int = None, upload_fil
     print(f"📌 Category URL: {category_url}")
     print(f"📁 Output Folder: {config.DATA_FOLDER}")
     print(f"☁️ Upload Files: {upload_files}")
+    print(f"⚡ Max Workers: {max_workers}")
     if max_items:
         print(f"🔢 Max Items: {max_items}")
     print("=" * 60 + "\n")
@@ -73,27 +78,44 @@ def crawl_category_and_save(category_url: str, max_items: int = None, upload_fil
     total_items = len(item_ids)
     print(f"\n📊 Found {total_items} documents to process\n")
     
-    # Step 2: Crawl each document
+    # Step 2: Crawl documents in parallel
     saved_files = []
     success_count = 0
     error_count = 0
     
-    for index, item_id in enumerate(item_ids, 1):
-        print(f"\n[{index}/{total_items}] Processing document ID: {item_id}")
-        
+    def process_item(item_id):
         try:
             # Crawl document details
             document = crawler_detail.crawl_document(item_id, upload_files=upload_files)
-            
             # Save to JSON
             file_path = save_document(document)
-            saved_files.append(file_path)
-            success_count += 1
-            
+            return True, file_path
         except Exception as e:
             print(f"❌ Error processing ID {item_id}: {e}")
-            error_count += 1
-            continue
+            return False, item_id
+    
+    print(f"🔄 Processing {total_items} items with {max_workers} threads...")
+    
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Map item_ids to the processing function
+        future_to_id = {executor.submit(process_item, item_id): item_id for item_id in item_ids}
+        
+        for index, future in enumerate(concurrent.futures.as_completed(future_to_id), 1):
+            item_id = future_to_id[future]
+            try:
+                success, result = future.result()
+                if success:
+                    saved_files.append(result)
+                    success_count += 1
+                else:
+                    error_count += 1
+            except Exception as e:
+                print(f"❌ Unhandled exception for ID {item_id}: {e}")
+                error_count += 1
+                
+            # Progress update (simple count)
+            if index % 1 == 0:
+                print(f"   [Progress: {index}/{total_items}]")
     
     # Summary
     print("\n" + "=" * 60)
@@ -135,7 +157,7 @@ def main():
     parser.add_argument(
         '--category', '-c',
         type=str,
-        help='Category URL to crawl (e.g., https://vbpl.vn/TW/Pages/vanban.aspx?idLoaiVanBan=16&dvid=13)'
+        help='Category URL to crawl'
     )
     
     parser.add_argument(
@@ -152,6 +174,13 @@ def main():
     )
     
     parser.add_argument(
+        '--workers', '-w',
+        type=int,
+        default=5,
+        help='Number of concurrent threads (default: 5)'
+    )
+    
+    parser.add_argument(
         '--no-upload',
         action='store_true',
         help='Skip file upload to Google Drive'
@@ -165,8 +194,13 @@ def main():
         # Crawl single document
         crawl_single_document(args.id, upload_files=upload_files)
     elif args.category:
-        # Crawl entire category
-        crawl_category_and_save(args.category, max_items=args.max, upload_files=upload_files)
+        # Crawl entire category with multi-threading
+        crawl_category_and_save(
+            args.category, 
+            max_items=args.max, 
+            upload_files=upload_files,
+            max_workers=args.workers
+        )
     else:
         # Default: show help and run with sample
         parser.print_help()

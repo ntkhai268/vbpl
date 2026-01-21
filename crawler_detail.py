@@ -29,8 +29,6 @@ ATTRIBUTE_MAPPING = {
 }
 
 
-
-
 def crawl_attributes(item_id: str) -> Dict[str, str]:
     """
     Extract document attributes from the thuoctinh page.
@@ -280,6 +278,16 @@ def crawl_files(item_id: str, folder_id: str = None) -> Dict[str, Optional[str]]
         nonlocal result
         
         file_ext = os.path.splitext(local_path)[1].lower()
+        
+        # Skip if we already have this file type
+        if file_ext in ['.doc', '.docx'] and result['doc_url']:
+            print(f"⏭️ Already have doc file, skipping: {os.path.basename(local_path)}")
+            utils.delete_file(local_path)
+            return
+        if file_ext == '.pdf' and result['pdf_url']:
+            print(f"⏭️ Already have pdf file, skipping: {os.path.basename(local_path)}")
+            utils.delete_file(local_path)
+            return
         
         # Upload to Drive
         drive_link = drive_manager.upload_file(local_path, folder_id=folder_id)

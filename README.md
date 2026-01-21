@@ -62,6 +62,18 @@ python main.py --category "https://vbpl.vn/TW/Pages/vanban.aspx?idLoaiVanBan=15&
 python main.py --category "https://vbpl.vn/TW/Pages/vanban.aspx?idLoaiVanBan=15&dvid=13" --max 5
 ```
 
+### Thu thập theo danh mục (Đa luồng)
+
+Tăng tốc độ thu thập bằng cách chạy nhiều luồng song song (mặc định 5).
+
+```bash
+# Sử dụng 10 luồng
+python main.py --category "http://...cat_url..." --workers 10
+
+# Sử dụng 10 luồng và giới hạn 20 văn bản
+python main.py --category "http://...cat_url..." --workers 10 --max 20
+```
+
 ### Không upload file lên Drive
 
 ```bash
@@ -74,6 +86,7 @@ python main.py --id 32801 --no-upload
 |---------|-------|
 | `--id`, `-i` | ID văn bản cần thu thập |
 | `--category`, `-c` | URL danh mục cần thu thập |
+| `--workers`, `-w` | Số luồng chạy song song (mặc định: 5) |
 | `--max`, `-m` | Số lượng văn bản tối đa |
 | `--no-upload` | Bỏ qua upload file lên Drive |
 

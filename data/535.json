@@ -1,0 +1,23 @@
+{
+  "_id": "535",
+  "thuoc_tinh": {
+    "ten_van_ban": "Hiến pháp năm 1946",
+    "tinh_trang_hieu_luc": "Hết hiệu lực toàn bộ",
+    "so_ky_hieu": "Không số",
+    "ngay_ban_hanh": "09/11/1946",
+    "loai_van_ban": "Hiến pháp",
+    "ngay_co_hieu_luc": "09/11/1946",
+    "nguon_thu_thap": "Tập san",
+    "co_quan_ban_hanh": "Quốc hội",
+    "chuc_danh": "Đang cập nhật",
+    "nguoi_ky": "Đang cập nhật",
+    "pham_vi": "Toàn quốc"
+  },
+  "van_ban_lien_quan": {},
+  "metadata_he_thong": {
+    "ngay_crawl": "2026-01-21T16:09:28.423312",
+    "source_url": "https://vbpl.vn/TW/Pages/vbpq-van-ban-goc.aspx?ItemID=535",
+    "doc_url": "https://docs.google.com/document/d/1TDmXM39L6bqF1Wf4E9-6t9wGV4Mu21IU/edit?usp=drivesdk&ouid=113381960136114056860&rtpof=true&sd=true",
+    "pdf_url": null
+  }
+}
