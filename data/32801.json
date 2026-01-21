@@ -1,0 +1,30 @@
+{
+  "_id": "32801",
+  "thuoc_tinh": {
+    "ten_van_ban": "Hiến pháp năm 2013",
+    "tinh_trang_hieu_luc": "Hết hiệu lực một phần",
+    "so_ky_hieu": "Không số",
+    "ngay_ban_hanh": "28/11/2013",
+    "loai_van_ban": "Hiến pháp",
+    "ngay_co_hieu_luc": "01/01/2014",
+    "nguon_thu_thap": "Công báo số 1003+1004, năm 2013",
+    "co_quan_ban_hanh": "Quốc hội",
+    "chuc_danh": "Chủ tịch Quốc hội",
+    "nguoi_ky": "Nguyễn Sinh Hùng",
+    "pham_vi": "Toàn quốc"
+  },
+  "van_ban_lien_quan": {
+    "van_ban_dan_chieu": [
+      "11234",
+      "1534",
+      "889",
+      "535"
+    ]
+  },
+  "metadata_he_thong": {
+    "ngay_crawl": "2026-01-21T11:42:21.794681",
+    "source_url": "https://vbpl.vn/TW/Pages/vbpq-van-ban-goc.aspx?ItemID=32801",
+    "doc_url": null,
+    "pdf_url": null
+  }
+}

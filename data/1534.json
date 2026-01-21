@@ -1,0 +1,26 @@
+{
+  "_id": "1534",
+  "thuoc_tinh": {
+    "ten_van_ban": "Hiến pháp năm 1980",
+    "tinh_trang_hieu_luc": "",
+    "so_ky_hieu": "Không số",
+    "ngay_ban_hanh": "18/12/1980",
+    "loai_van_ban": "Hiến pháp",
+    "ngay_co_hieu_luc": "",
+    "nguon_thu_thap": "Công báo số 21, năm 1980",
+    "co_quan_ban_hanh": "Quốc hội",
+    "nguoi_ky": "Trường Chinh",
+    "pham_vi": "Toàn quốc"
+  },
+  "van_ban_lien_quan": {
+    "van_ban_bi_thay_the": [
+      "889"
+    ]
+  },
+  "metadata_he_thong": {
+    "ngay_crawl": "2026-01-21T11:29:34.577940",
+    "source_url": "https://vbpl.vn/TW/Pages/vbpq-van-ban-goc.aspx?ItemID=1534",
+    "doc_url": null,
+    "pdf_url": null
+  }
+}

@@ -1,0 +1,37 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# IDE settings
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Environment variables
+.env
+.env.local
+
+# Google API credentials (sensitive)
+credentials.json
+token.json
+
+# Temporary files
+temp/
+*.tmp
+*.log
+
+# Data files (optional - uncomment if you want to track data)
+# data/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini

@@ -1,0 +1,26 @@
+{
+  "_id": "889",
+  "thuoc_tinh": {
+    "ten_van_ban": "Hiến pháp năm 1959",
+    "tinh_trang_hieu_luc": "",
+    "so_ky_hieu": "Không số",
+    "ngay_ban_hanh": "31/12/1959",
+    "loai_van_ban": "Hiến pháp",
+    "ngay_co_hieu_luc": "",
+    "nguon_thu_thap": "Công báo số 1, năm 1960",
+    "co_quan_ban_hanh": "Quốc hội",
+    "nguoi_ky": "Tôn Đức Thắng",
+    "pham_vi": "Toàn quốc"
+  },
+  "van_ban_lien_quan": {
+    "van_ban_bi_thay_the": [
+      "535"
+    ]
+  },
+  "metadata_he_thong": {
+    "ngay_crawl": "2026-01-21T11:30:39.314919",
+    "source_url": "https://vbpl.vn/TW/Pages/vbpq-van-ban-goc.aspx?ItemID=889",
+    "doc_url": "https://docs.google.com/document/d/1wvRM-yQLq7qwqPgRH2b3g-OERk9R1mlE/edit?usp=drivesdk&ouid=113381960136114056860&rtpof=true&sd=true",
+    "pdf_url": null
+  }
+}

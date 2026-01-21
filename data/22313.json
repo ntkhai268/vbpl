@@ -1,0 +1,26 @@
+{
+  "_id": "22313",
+  "thuoc_tinh": {
+    "ten_van_ban": "Hiến pháp năm 1992 (sửa đổi, bổ sung năm 2001)",
+    "tinh_trang_hieu_luc": "",
+    "so_ky_hieu": "Không số",
+    "ngay_ban_hanh": "25/12/2001",
+    "loai_van_ban": "Hiến pháp",
+    "ngay_co_hieu_luc": "",
+    "nguon_thu_thap": "Công báo điện tử",
+    "co_quan_ban_hanh": "Quốc hội",
+    "nguoi_ky": "Nguyễn Văn An",
+    "pham_vi": "Toàn quốc"
+  },
+  "van_ban_lien_quan": {
+    "van_ban_duoc_sua_doi_bo_sung": [
+      "11234"
+    ]
+  },
+  "metadata_he_thong": {
+    "ngay_crawl": "2026-01-21T11:28:59.234817",
+    "source_url": "https://vbpl.vn/TW/Pages/vbpq-van-ban-goc.aspx?ItemID=22313",
+    "doc_url": null,
+    "pdf_url": null
+  }
+}
