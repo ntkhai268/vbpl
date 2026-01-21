@@ -192,6 +192,93 @@ def delete_file(file_path: str) -> bool:
     return False
 
 
+def extract_archive(archive_path: str, extract_to: str = None) -> list:
+    """
+    Extract .zip or .rar archive recursively until no more archives remain.
+    Only returns paths to .doc, .docx, .pdf files.
+    
+    Args:
+        archive_path: Path to the archive file
+        extract_to: Folder to extract to (defaults to config.TEMP_FOLDER)
+        
+    Returns:
+        List of extracted file paths (only .doc, .docx, .pdf)
+    """
+    import zipfile
+    import shutil
+    
+    if extract_to is None:
+        extract_to = config.TEMP_FOLDER
+    
+    os.makedirs(extract_to, exist_ok=True)
+    
+    valid_extensions = ['.doc', '.docx', '.pdf']
+    archive_extensions = ['.zip', '.rar']
+    result_files = []
+    
+    file_ext = os.path.splitext(archive_path)[1].lower()
+    
+    if file_ext == '.zip':
+        try:
+            print(f"📦 Extracting ZIP: {os.path.basename(archive_path)}...")
+            with zipfile.ZipFile(archive_path, 'r') as zf:
+                zf.extractall(extract_to)
+                
+                for name in zf.namelist():
+                    extracted_path = os.path.join(extract_to, name)
+                    if os.path.isfile(extracted_path):
+                        ext = os.path.splitext(name)[1].lower()
+                        
+                        # If it's another archive, extract recursively
+                        if ext in archive_extensions:
+                            nested_files = extract_archive(extracted_path, extract_to)
+                            result_files.extend(nested_files)
+                            delete_file(extracted_path)
+                        # If it's a valid document, add to results
+                        elif ext in valid_extensions:
+                            result_files.append(extracted_path)
+                            print(f"   ✅ Found: {name}")
+                        # Otherwise, delete unwanted file
+                        else:
+                            delete_file(extracted_path)
+                            
+        except zipfile.BadZipFile:
+            print(f"❌ Invalid ZIP file: {archive_path}")
+        except Exception as e:
+            print(f"❌ Error extracting ZIP: {e}")
+            
+    elif file_ext == '.rar':
+        try:
+            # Try using rarfile if available
+            import rarfile
+            print(f"📦 Extracting RAR: {os.path.basename(archive_path)}...")
+            with rarfile.RarFile(archive_path, 'r') as rf:
+                rf.extractall(extract_to)
+                
+                for name in rf.namelist():
+                    extracted_path = os.path.join(extract_to, name)
+                    if os.path.isfile(extracted_path):
+                        ext = os.path.splitext(name)[1].lower()
+                        
+                        if ext in archive_extensions:
+                            nested_files = extract_archive(extracted_path, extract_to)
+                            result_files.extend(nested_files)
+                            delete_file(extracted_path)
+                        elif ext in valid_extensions:
+                            result_files.append(extracted_path)
+                            print(f"   ✅ Found: {name}")
+                        else:
+                            delete_file(extracted_path)
+                            
+        except ImportError:
+            print(f"⚠️ rarfile module not installed. Cannot extract RAR files.")
+            print(f"   Install with: pip install rarfile")
+        except Exception as e:
+            print(f"❌ Error extracting RAR: {e}")
+    
+    return result_files
+
+
 if __name__ == "__main__":
     print("=" * 50)
     print("🔧 Testing Utils Module")

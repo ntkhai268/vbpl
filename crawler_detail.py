@@ -219,6 +219,8 @@ def crawl_related_docs(item_id: str) -> Dict[str, List[str]]:
 def crawl_files(item_id: str, folder_id: str = None) -> Dict[str, Optional[str]]:
     """
     Download document files and upload to Google Drive.
+    Only uploads .doc, .docx, .pdf files.
+    Extracts .zip/.rar archives to find valid documents inside.
     
     Args:
         item_id: Document ItemID
@@ -240,6 +242,13 @@ def crawl_files(item_id: str, folder_id: str = None) -> Dict[str, Optional[str]]
         'pdf_url': None
     }
     
+    # Valid file extensions to upload
+    valid_extensions = ['.doc', '.docx', '.pdf']
+    # Archive extensions to extract
+    archive_extensions = ['.zip', '.rar']
+    # Invalid extensions to skip
+    invalid_extensions = ['.aspx', '.html', '.htm', '.php', '.js', '.css']
+    
     # Find download links
     download_links = []
     
@@ -251,38 +260,72 @@ def crawl_files(item_id: str, folder_id: str = None) -> Dict[str, Optional[str]]
         if not href or 'ShowDialogDownload' in href:
             continue
         
+        # Skip javascript: links that don't have downloadfile
+        if href.startswith('javascript:') and 'downloadfile' not in href.lower():
+            continue
+        
         # Check for downloadfile JavaScript links (with actual file path)
         if 'downloadfile' in href.lower():
             download_links.append(href)
         # Check for direct file links
-        elif href.lower().endswith(('.doc', '.docx', '.pdf')):
+        elif href.lower().endswith(tuple(valid_extensions + archive_extensions)):
             download_links.append(href)
         # Check link text for file indicators
         elif any(ext in text for ext in ['.doc', '.pdf', 'tải về', 'download']):
             if href:
                 download_links.append(href)
     
+    def upload_valid_file(local_path: str) -> None:
+        """Helper to upload a valid file and update result dict."""
+        nonlocal result
+        
+        file_ext = os.path.splitext(local_path)[1].lower()
+        
+        # Upload to Drive
+        drive_link = drive_manager.upload_file(local_path, folder_id=folder_id)
+        
+        if drive_link:
+            if file_ext in ['.doc', '.docx']:
+                result['doc_url'] = drive_link
+            elif file_ext == '.pdf':
+                result['pdf_url'] = drive_link
+        
+        # Clean up local file
+        utils.delete_file(local_path)
+        print(f"🗑️ Cleaned up local file: {local_path}")
+    
     for dl_link in download_links:
         try:
             # Download file locally
             local_path = utils.download_file_from_vbpl(dl_link)
             
-            if local_path and os.path.exists(local_path):
-                # Determine file type
-                file_ext = os.path.splitext(local_path)[1].lower()
-                
-                # Upload to Drive
-                drive_link = drive_manager.upload_file(local_path, folder_id=folder_id)
-                
-                if drive_link:
-                    if file_ext in ['.doc', '.docx']:
-                        result['doc_url'] = drive_link
-                    elif file_ext == '.pdf':
-                        result['pdf_url'] = drive_link
-                
-                # Clean up local file
+            if not local_path or not os.path.exists(local_path):
+                continue
+            
+            file_ext = os.path.splitext(local_path)[1].lower()
+            
+            # Skip invalid file types (like .aspx)
+            if file_ext in invalid_extensions:
+                print(f"⏭️ Skipping invalid file type: {os.path.basename(local_path)}")
                 utils.delete_file(local_path)
-                print(f"🗑️ Cleaned up local file: {local_path}")
+                continue
+            
+            # Handle archives - extract and get doc/pdf files
+            if file_ext in archive_extensions:
+                print(f"📦 Found archive: {os.path.basename(local_path)}")
+                extracted_files = utils.extract_archive(local_path)
+                utils.delete_file(local_path)  # Clean up archive
+                
+                for extracted_path in extracted_files:
+                    upload_valid_file(extracted_path)
+                continue
+            
+            # Only upload valid document types
+            if file_ext in valid_extensions:
+                upload_valid_file(local_path)
+            else:
+                print(f"⏭️ Skipping unsupported file type: {os.path.basename(local_path)}")
+                utils.delete_file(local_path)
                 
         except Exception as e:
             print(f"⚠️ Error processing file {dl_link}: {e}")
