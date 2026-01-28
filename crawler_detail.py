@@ -65,22 +65,53 @@ def crawl_attributes(item_id: str) -> Dict[str, str]:
         # Handle special row: "Cơ quan ban hành/ Chức danh / Người ký"
         # Structure: [label] [co_quan] [chuc_danh] [nguoi_ky]
         if 'Cơ quan ban hành' in label_text and 'Người ký' in label_text:
-            if len(cells) >= 4:
-                # Cell 1: co_quan_ban_hanh (may contain <a> tag)
-                co_quan_cell = cells[1]
-                co_quan_link = co_quan_cell.find('a')
-                if co_quan_link:
-                    attributes['co_quan_ban_hanh'] = utils.clean_text(co_quan_link.get_text())
+            # Prepare lists to collect multiple values
+            co_quan_list = []
+            chuc_danh_list = []
+            nguoi_ky_list = []
+            
+            def extract_signer_data(row_cells, is_main_row):
+                # For main row: [Label, CoQuan, ChucDanh, NguoiKy] (4 cells)
+                # For sub row: [CoQuan, ChucDanh, NguoiKy] (3 cells)
+                if is_main_row:
+                    if len(row_cells) < 4: return
+                    idx_co_quan, idx_chuc_danh, idx_nguoi_ky = 1, 2, 3
                 else:
-                    attributes['co_quan_ban_hanh'] = utils.clean_text(co_quan_cell.get_text())
+                    if len(row_cells) < 3: return
+                    idx_co_quan, idx_chuc_danh, idx_nguoi_ky = 0, 1, 2
                 
-                # Cell 2: chuc_danh
-                chuc_danh = utils.clean_text(cells[2].get_text())
-                if chuc_danh:
-                    attributes['chuc_danh'] = chuc_danh
+                # Extract Co Quan
+                co_quan_cell = row_cells[idx_co_quan]
+                co_quan_link = co_quan_cell.find('a')
+                cq_text = utils.clean_text(co_quan_link.get_text()) if co_quan_link else utils.clean_text(co_quan_cell.get_text())
+                if cq_text: co_quan_list.append(cq_text)
                 
-                # Cell 3: nguoi_ky
-                attributes['nguoi_ky'] = utils.clean_text(cells[3].get_text())
+                # Extract Chuc Danh
+                cd_text = utils.clean_text(row_cells[idx_chuc_danh].get_text())
+                if cd_text: chuc_danh_list.append(cd_text)
+                
+                # Extract Nguoi Ky
+                nk_text = utils.clean_text(row_cells[idx_nguoi_ky].get_text())
+                if nk_text: nguoi_ky_list.append(nk_text)
+
+            # Process the main row first
+            extract_signer_data(cells, is_main_row=True)
+            
+            # Check subsequent rows for more signers (greedy consumption)
+            # These rows usually lack class="label" because of rowspan, so main loop skips them
+            for sibling in row.find_next_siblings('tr'):
+                sibling_label = sibling.find('td', class_='label')
+                if sibling_label:
+                    break # End of this section
+                
+                sibling_cells = sibling.find_all('td')
+                extract_signer_data(sibling_cells, is_main_row=False)
+            
+            # Store joined results
+            if co_quan_list: attributes['co_quan_ban_hanh'] = '; '.join(co_quan_list)
+            if chuc_danh_list: attributes['chuc_danh'] = '; '.join(chuc_danh_list)
+            if nguoi_ky_list: attributes['nguoi_ky'] = '; '.join(nguoi_ky_list)
+            
             continue
         
         # Handle standard 2-column rows: [label] [value]

@@ -7,7 +7,7 @@ Centralized configuration for the scraping system.
 import os
 
 # === Google Drive Configuration ===
-DRIVE_FOLDER_ID = "1CM8EQglHrZjDCvpHA8hcxirIXjwvqg8g"
+DRIVE_FOLDER_ID = "1lOkT2QV0gTTMx5VLdCFof7Z5ToX3Fr4x"
 CREDENTIALS_FILE = os.path.join(os.path.dirname(__file__), "credentials.json")
 TOKEN_FILE = os.path.join(os.path.dirname(__file__), "token.json")
 
